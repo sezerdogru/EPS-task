@@ -5,19 +5,18 @@ import { useCurrencyRates } from "../context/CurrencyContext";
 import { useMemo } from "react";
 
 const Table = () => {
-  const { rates, isPending } = useCurrencyRates();
+  const { rates, isPending, isFetching } = useCurrencyRates();
 
-  if (isPending || !rates.length) {
+  const fields = useMemo(() => {
+    if (!rates || rates.length === 0) return [];
+    return Object.keys(
+      rates[0].rates.reduce((acc, cur) => ({ ...acc, ...cur }), {})
+    );
+  }, [rates]);
+
+  if (isPending || isFetching || !rates.length) {
     return <div>Loading...</div>;
   }
-
-  const fields = useMemo(
-    () =>
-      Object.keys(
-        rates[0].rates.reduce((acc, cur) => ({ ...acc, ...cur }), {})
-      ),
-    [rates]
-  );
 
   return (
     <table className="table-auto border-collapse border border-slate-400 w-full">

@@ -17,6 +17,11 @@ declare global {
     value: string;
     label: string;
   };
+
+  type Option = {
+    value: string;
+    label: string;
+  };
 }
 
 export {};

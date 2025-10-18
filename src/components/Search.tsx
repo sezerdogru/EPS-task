@@ -1,76 +1,28 @@
 "use client";
 
-import { useCurrencyRates } from "@/context/CurrencyContext";
-import useFetchCurrencies from "@/hooks/useFetchCurrencies";
 import { ActionMeta } from "react-select";
-import makeAnimated from "react-select/animated";
-import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import CustomDatepicker from "./CustomDatepicker";
+import { daysSince } from "@/utils/dateUtils";
+import useSearchHook from "@/hooks/useSearchHook";
 
 const Select = dynamic(() => import("react-select"), {
   ssr: false,
 });
 
-interface Option {
-  value: string;
-  label: string;
-}
-
 export default function Search() {
   const {
+    options,
+    selectedOption,
     selectedCurrency,
-    selectedCurrencies,
-    refetch,
-    setSelectedCurrencies,
+    animatedComponents,
     setSelectedCurrency,
+    refetch,
+    selectedCurrencies,
+    handleChange,
+    isFetching,
     date,
-  } = useCurrencyRates();
-
-  const { currencies } = useFetchCurrencies();
-
-  const options: Option[] = useMemo(
-    () =>
-      currencies
-        ? Object.entries(currencies).map(([code, name]) => ({
-            value: code,
-            label: `${name}`,
-          }))
-        : [],
-    [currencies]
-  );
-
-  const selectedOption = useMemo(
-    () => options.find((o) => o.value === selectedCurrency) || null,
-    [options, selectedCurrency]
-  );
-
-  const animatedComponents = makeAnimated();
-
-  const handleChange = (newValue: unknown, actionMeta: ActionMeta<unknown>) => {
-    const valueArray = newValue as Option[];
-
-    switch (actionMeta.action) {
-      case "remove-value":
-      case "pop-value":
-        if (valueArray.length < 3) {
-          alert("List must consist of min 3 elements!");
-          return;
-        }
-        break;
-
-      case "clear":
-        alert("Cannot clear all items, minimum 3 required!");
-        return;
-    }
-
-    if (valueArray.length > 7) {
-      alert("List must consist of max 7 elements!");
-      return;
-    }
-
-    setSelectedCurrencies(newValue as Option[]);
-  };
+  } = useSearchHook();
 
   return (
     <div className="flex gap-2 flex-col w-full border border-gray-400 rounded-lg p-2">
@@ -95,8 +47,7 @@ export default function Search() {
           />
         </div>
         <div className="flex flex-col gap-6">
-          <span className="text-xl font-bold">Date: {date}</span>
-
+          <span className="text-xl font-bold">Last {daysSince(date)} days</span>
           <CustomDatepicker />
         </div>
       </div>
@@ -122,6 +73,7 @@ export default function Search() {
         <button
           className="self-end px-6 py-2 rounded-lg bg-blue-200"
           onClick={refetch}
+          disabled={isFetching}
         >
           Search
         </button>

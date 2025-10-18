@@ -29,6 +29,7 @@ interface CurrencyRatesContextValue {
   date: string;
   error: string | null;
   isPending: boolean;
+  isFetching: boolean;
 
   refetch: () => Promise<void>;
   setSelectedCurrency: (currency: string) => void;
@@ -51,7 +52,7 @@ export const CurrencyRatesProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const sevenDaysAgoString = calculateInitialDate();
-
+  const [isFetching, setIsFetching] = useState(false);
   const [rates, setRates] = useState<RatesLoopData[]>([]);
   const [selectedCurrencies, setSelectedCurrencies] = useState<
     CurrencyItemProps[]
@@ -83,6 +84,7 @@ export const CurrencyRatesProvider: React.FC<{ children: ReactNode }> = ({
 
   const refetch = useCallback(async () => {
     setError(null);
+    setIsFetching(true);
 
     try {
       const startDate = new Date(date);
@@ -132,6 +134,8 @@ export const CurrencyRatesProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error: unknown) {
       if (error instanceof Error) setError(error.message);
       else setError(String(error));
+    } finally {
+      setIsFetching(false);
     }
   }, [date, selectedCurrency, sortRates]);
 
@@ -149,6 +153,7 @@ export const CurrencyRatesProvider: React.FC<{ children: ReactNode }> = ({
     date,
     error,
     isPending,
+    isFetching,
     refetch,
     setSelectedCurrency,
     setSelectedCurrencies,
