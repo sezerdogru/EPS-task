@@ -1,11 +1,14 @@
 "use client";
 
+import { useAppSelector } from "@/store/store";
 import TableRow from "./TableRow";
-import { useCurrencyRates } from "../context/CurrencyContext";
 import { useMemo } from "react";
 
 const Table = () => {
-  const { rates, isPending, isFetching } = useCurrencyRates();
+  const rates = useAppSelector((state) => state.filters.rates);
+  const isFetching = useAppSelector(
+    (state) => state.filters.searchParams.isFetching
+  );
 
   const fields = useMemo(() => {
     if (!rates || rates.length === 0) return [];
@@ -14,8 +17,12 @@ const Table = () => {
     );
   }, [rates]);
 
-  if (isPending || isFetching || !rates.length) {
+  if (isFetching) {
     return <div>Loading...</div>;
+  }
+
+  if (!rates?.length) {
+    return <div>No data</div>;
   }
 
   return (

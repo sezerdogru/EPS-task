@@ -1,7 +1,7 @@
 "use client";
 
 import Table from "@/components/Table";
-import Search from "@/components/Search";
+import Search from "@/components/Search/Search";
 import { Toaster } from "react-hot-toast";
 
 export default function Home() {

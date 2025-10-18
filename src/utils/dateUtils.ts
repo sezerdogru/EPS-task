@@ -1,8 +1,3 @@
-/**
- * How many days have passed since the given date
- * @param dateStr - YYYY-MM-DD
- * @returns How many days
- */
 export function daysSince(dateStr: string): number {
   const givenDate: Date = new Date(dateStr);
   const today: Date = new Date();

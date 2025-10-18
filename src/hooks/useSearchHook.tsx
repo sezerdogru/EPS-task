@@ -1,41 +1,59 @@
 "use client";
 
-import { useCurrencyRates } from "@/context/CurrencyContext";
-import useFetchCurrencies from "@/hooks/useFetchCurrencies";
 import { ActionMeta } from "react-select";
 import makeAnimated from "react-select/animated";
+import {
+  setSelectedCurrency,
+  setSelectedCurrencies,
+} from "@/store/slices/filterSlice";
 import { useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/store";
+import { useGetAllCurrenciesQuery } from "@/api/currencyApi";
 
 export default function useSearchHook() {
-  const {
-    selectedCurrency,
-    selectedCurrencies,
-    refetch,
-    setSelectedCurrencies,
-    setSelectedCurrency,
-    isFetching,
-    date,
-  } = useCurrencyRates();
+  const dispatch = useAppDispatch();
 
-  const { currencies } = useFetchCurrencies();
-
-  const options: Option[] = useMemo(
-    () =>
-      currencies
-        ? Object.entries(currencies).map(([code, name]) => ({
-            value: code,
-            label: `${name}`,
-          }))
-        : [],
-    [currencies]
+  const selectedCurrency = useAppSelector(
+    (state) => state.filters.selectedCurrency
+  );
+  const selectedCurrencies = useAppSelector(
+    (state) => state.filters.selectedCurrencies
   );
 
+  const {
+    data: rates,
+    isLoading: isCurrenciesLoading,
+    isError,
+  } = useGetAllCurrenciesQuery(undefined, {
+    selectFromResult: ({ data, ...rest }) => ({
+      ...rest,
+      data: data
+        ? Object.entries(data).map(([code, name]) => ({
+            value: code,
+            label: name,
+          }))
+        : [],
+    }),
+  });
+
   const selectedOption = useMemo(
-    () => options.find((o) => o.value === selectedCurrency) || null,
-    [options, selectedCurrency]
+    () => rates.find((o) => o.value === selectedCurrency) || null,
+    [rates, selectedCurrency]
+  );
+
+  const selectedOptions = useMemo(
+    () =>
+      rates.filter((o) =>
+        selectedCurrencies.some((sel) => sel.value === o.value)
+      ),
+    [rates, selectedCurrencies]
   );
 
   const animatedComponents = makeAnimated();
+
+  const handleBaseCurrencyChange = (newValue: unknown) => {
+    dispatch(setSelectedCurrency((newValue as Option)?.value));
+  };
 
   const handleChange = (newValue: unknown, actionMeta: ActionMeta<unknown>) => {
     const valueArray = newValue as Option[];
@@ -59,19 +77,19 @@ export default function useSearchHook() {
       return;
     }
 
-    setSelectedCurrencies(newValue as Option[]);
+    dispatch(setSelectedCurrencies(newValue as Option[]));
   };
 
   return {
-    options,
+    rates,
     selectedOption,
+    selectedOptions,
     selectedCurrency,
-    animatedComponents,
-    setSelectedCurrency,
-    isFetching,
-    refetch,
     selectedCurrencies,
+    animatedComponents,
+    handleBaseCurrencyChange,
     handleChange,
-    date,
+    isCurrenciesLoading,
+    isError,
   };
 }
