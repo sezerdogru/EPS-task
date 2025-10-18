@@ -12,6 +12,16 @@ declare global {
     date: string;
     rates: CurrencyData[];
   };
+
+  type CurrencyItemProps = {
+    value: string;
+    label: string;
+  };
+
+  type Option = {
+    value: string;
+    label: string;
+  };
 }
 
 export {};
