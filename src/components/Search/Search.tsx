@@ -17,14 +17,13 @@ export default function Search() {
 
   const { selectedCurrency, date } = useAppSelector((state) => state.filters);
 
-  const [
-    triggerFetch,
-    { data: ratesData, isFetching, isSuccess, isUninitialized },
-  ] = useLazyGetRatesQuery();
+  const [triggerFetch, { data: ratesData, isFetching, isSuccess }] =
+    useLazyGetRatesQuery();
 
   useEffect(() => {
     dispatch(triggerSearch());
     triggerFetch({ base: selectedCurrency, date });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

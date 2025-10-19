@@ -16,7 +16,7 @@ export const calculateInitialDate = (): string => {
 
 export const calculateDatesInRange = (startDate: string): string[] => {
   const dates: string[] = [];
-  let currentDate = moment(startDate, "YYYY-MM-DD");
+  const currentDate = moment(startDate, "YYYY-MM-DD");
   const today = moment();
 
   while (currentDate.isSameOrBefore(today)) {
