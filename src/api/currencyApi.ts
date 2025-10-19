@@ -51,11 +51,13 @@ const customBaseQuery = async (
     );
 
     return { data: transformedRates };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       error: {
         status: "FETCH_ERROR",
-        data: error.message,
+        data: message,
       },
     };
   }
@@ -79,8 +81,16 @@ export const currencyApi = createApi({
           if (!res.ok) throw new Error("Failed to fetch currencies");
           const data = await res.json();
           return { data };
-        } catch (error: any) {
-          return { error: { status: 500, data: error.message } };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error occurred";
+
+          return {
+            error: {
+              status: 500,
+              data: message,
+            },
+          };
         }
       },
     }),
