@@ -1,27 +1,26 @@
 "use client";
 
-import { useAppSelector } from "@/store/store";
 import TableRow from "./TableRow";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
-const Table = () => {
-  const rates = useAppSelector((state) => state.filters.rates);
-  const isFetching = useAppSelector(
-    (state) => state.filters.searchParams.isFetching
-  );
+interface Props {
+  data: TransformedRatesType[] | undefined;
+  isLoading: boolean;
+}
 
-  const fields = useMemo(() => {
-    if (!rates || rates.length === 0) return [];
+const Table: React.FC<Props> = ({ data, isLoading }) => {
+  const tableFields: string[] = useMemo(() => {
+    if (!data || data.length === 0) return [];
     return Object.keys(
-      rates[0].rates.reduce((acc, cur) => ({ ...acc, ...cur }), {})
+      data[0].rates.reduce((acc, cur) => ({ ...acc, ...cur }), {})
     );
-  }, [rates]);
+  }, [data]);
 
-  if (isFetching) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!rates?.length) {
+  if (!data?.length) {
     return <div>No data</div>;
   }
 
@@ -32,7 +31,7 @@ const Table = () => {
           <th className="border border-slate-300 px-4 py-2">
             <span className="uppercase">DAY</span>
           </th>
-          {fields.map((currencyCode: string) => (
+          {tableFields.map((currencyCode: string) => (
             <th
               key={currencyCode}
               className="border border-slate-300 px-4 py-2"
@@ -43,12 +42,12 @@ const Table = () => {
         </tr>
       </thead>
       <tbody>
-        {rates.map((rate: RatesLoopData) => (
-          <TableRow key={rate.date} rate={rate} currencyList={fields} />
+        {data.map((rate: TransformedRatesType) => (
+          <TableRow key={rate.date} rate={rate} tableFields={tableFields} />
         ))}
       </tbody>
     </table>
   );
 };
 
-export default Table;
+export default memo(Table);

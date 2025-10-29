@@ -1,18 +1,33 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import useSearchHook from "@/hooks/useSearchHook";
+import { useCurrencyList } from "@/hooks/useCurrencyList";
+import { useMemo } from "react";
+import makeAnimated from "react-select/animated";
+import { useSelectedCurrencies } from "@/context/SelectedCurrenciesContext";
 
 const Select = dynamic(() => import("react-select"), { ssr: false });
 
-export default function Selectedcurrencies() {
-  const {
-    rates,
-    selectedOptions,
-    animatedComponents,
-    handleChange,
-    isCurrenciesLoading,
-  } = useSearchHook();
+export default function SelectedCurrencies() {
+  const { data: currencies, isLoading } = useCurrencyList();
+  const { selectedCurrencies, handleChange } = useSelectedCurrencies();
+  const animatedComponents = makeAnimated();
+
+  const options: Option[] = useMemo(() => {
+    if (!currencies) return [];
+    return Object.entries(currencies).map(([code, name]) => ({
+      value: code,
+      label: name as string,
+    }));
+  }, [currencies]);
+
+  const selectedOptions: Option[] = useMemo(
+    () =>
+      options.filter((o: Option) =>
+        selectedCurrencies.some((sel: Option) => sel.value === o.value)
+      ),
+    [options, selectedCurrencies]
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,9 +42,9 @@ export default function Selectedcurrencies() {
         captureMenuScroll
         onChange={handleChange}
         components={animatedComponents}
-        options={rates}
+        options={options}
         value={selectedOptions}
-        isLoading={isCurrenciesLoading}
+        isLoading={isLoading}
         placeholder={`Select currency...`}
         instanceId="currency-select-box"
       />

@@ -1,21 +1,16 @@
 declare global {
-  type CurrencyData = {
+  type CurrencyType = {
     [code: string]: number;
   };
 
-  type RatesData = {
+  type RatesType = {
     date: string;
     [baseCurrency: string]: CurrencyData;
   };
 
-  type RatesLoopData = {
+  type TransformedRatesType = {
     date: string;
     rates: CurrencyData[];
-  };
-
-  type CurrencyItemProps = {
-    value: string;
-    label: string;
   };
 
   type Option = {

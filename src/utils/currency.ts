@@ -27,13 +27,13 @@ export const calculateDatesInRange = (startDate: string): string[] => {
 };
 
 export const transformRatesData = (
-  rawRates: RatesData[],
+  rawRates: RatesType[],
   baseCurrency: string,
   compareCurrencies: Option[]
-): RatesLoopData[] => {
+): TransformedRatesType[] => {
   const base = baseCurrency.toLowerCase();
 
-  const transformedRates: RatesLoopData[] = rawRates
+  const transformedRates: TransformedRatesType[] = rawRates
     .map((rate) => {
       const baseData = rate[base] as { [key: string]: number };
 

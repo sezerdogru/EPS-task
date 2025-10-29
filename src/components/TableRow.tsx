@@ -1,16 +1,16 @@
 import { memo } from "react";
 
-interface TableRowProps {
-  rate: RatesLoopData;
-  currencyList: string[];
+interface Props {
+  rate: TransformedRatesType;
+  tableFields: string[];
 }
 
-const TableRow = ({ rate, currencyList }: TableRowProps) => {
+const TableRow = ({ rate, tableFields }: Props) => {
   return (
     <tr>
       <td className="border border-slate-300 px-4 py-2">{rate.date}</td>
-      {Object.values(rate.rates).map((data: CurrencyData, index: number) => {
-        const curr = currencyList[index];
+      {Object.values(rate.rates).map((data: CurrencyType, index: number) => {
+        const curr = tableFields[index];
         return (
           <td key={index} className="border border-slate-300 px-4 py-2">
             {data[curr] !== null ? data[curr]?.toFixed(4) : "N/A"}
